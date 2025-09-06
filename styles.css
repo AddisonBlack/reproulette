@@ -123,3 +123,9 @@ body {
   font-size: 14px;
   padding: 24px 45px;
 }
+
+@media(max-width <= 768px) {
+  .start-btn {
+    max-width: 85%;
+  }
+}
