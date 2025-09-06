@@ -119,8 +119,7 @@ body {
 
 .start-btn {
   transform: scale(1.6);
-  padding: 24px 28px;
   letter-spacing: 1.6px;
   font-size: 14px;
-  padding: 24px 60px;
+  padding: 24px 45px;
 }
