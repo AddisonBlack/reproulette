@@ -8,9 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const startScreen = document.getElementById("start-screen");
   const startBtn = startScreen?.querySelector(".start-btn");
   const shuffleBtn = document.querySelector(".name-container .shuffle");
+  const mascot = document.querySelector(".corner-image");
 
   const todayKey = new Date().toISOString().slice(0, 10);
-  const STORAGE_KEY = "repRoulette:startUsedDate";
+  const STORAGE_KEY_DAY = "repRoulette:startUsedDate";
+  const STORAGE_KEY_ORDER = "repRoulette:namesOrder";
 
   function showMain() {
     if (nameContainer) nameContainer.style.display = "flex";
@@ -22,6 +24,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (startScreen) startScreen.style.display = "flex";
   }
 
+  function getNameNodes() {
+    return Array.from(nameContainer.querySelectorAll(".name"));
+  }
+
+  function applyOrder(order) {
+    const buttonRow = nameContainer.querySelector("div");
+    const map = new Map(getNameNodes().map(el => [el.textContent.trim(), el]));
+    order.forEach(text => {
+      const node = map.get(text);
+      if (node) nameContainer.insertBefore(node, buttonRow);
+    });
+  }
+
+  function saveCurrentOrder() {
+    const order = getNameNodes().map(el => el.textContent.trim());
+    localStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
+  }
+
   function shuffleNodes(nodes) {
     const arr = Array.from(nodes);
     for (let i = arr.length - 1; i > 0; i--) {
@@ -31,35 +51,43 @@ document.addEventListener("DOMContentLoaded", () => {
     return arr;
   }
 
-  const lastUsed = localStorage.getItem(STORAGE_KEY);
+  const savedOrder = localStorage.getItem(STORAGE_KEY_ORDER);
+  if (savedOrder) {
+    try {
+      applyOrder(JSON.parse(savedOrder));
+    } catch {}
+  }
+
+  const lastUsed = localStorage.getItem(STORAGE_KEY_DAY);
   if (lastUsed === todayKey) {
     showMain();
   } else {
-    showStart();
+    if (savedOrder) {
+      showMain();
+    } else {
+      showStart();
+    }
   }
 
   startBtn?.addEventListener("click", () => {
-    const nameEls = nameContainer.querySelectorAll(".name");
+    const nameEls = getNameNodes();
     const buttonRow = nameContainer.querySelector("div");
     const shuffled = shuffleNodes(nameEls);
     shuffled.forEach(el => nameContainer.insertBefore(el, buttonRow));
-    localStorage.setItem(STORAGE_KEY, todayKey);
+    saveCurrentOrder();
+    localStorage.setItem(STORAGE_KEY_DAY, todayKey);
     showMain();
+
+    if (mascot) mascot.style.display = "flex";
   });
 
   shuffleBtn?.addEventListener("click", () => {
-    const nameEls = nameContainer.querySelectorAll(".name");
+    const nameEls = getNameNodes();
     const buttonRow = nameContainer.querySelector("div");
-
     if (nameEls.length > 0) {
       const first = nameEls[0];
       nameContainer.insertBefore(first, buttonRow);
+      saveCurrentOrder();
     }
   });
 });
-
-document.querySelector(".start-btn").addEventListener("click", showMascot);
-
-function showMascot() {
-  document.querySelector(".corner-image").style.display = "flex";
-}
