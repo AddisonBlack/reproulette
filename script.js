@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const todayKey = new Date().toISOString().slice(0, 10);
   const STORAGE_KEY_DAY = "repRoulette:startUsedDate";
   const STORAGE_KEY_ORDER = "repRoulette:namesOrder";
+  const STORAGE_KEY_MASCOT = "repRoulette:mascotVisible";
 
   function showMain() {
     if (nameContainer) nameContainer.style.display = "flex";
@@ -69,6 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  if (localStorage.getItem(STORAGE_KEY_MASCOT) === "true") {
+    if (mascot) mascot.style.display = "flex";
+  }
+
   startBtn?.addEventListener("click", () => {
     const nameEls = getNameNodes();
     const buttonRow = nameContainer.querySelector("div");
@@ -76,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     shuffled.forEach(el => nameContainer.insertBefore(el, buttonRow));
     saveCurrentOrder();
     localStorage.setItem(STORAGE_KEY_DAY, todayKey);
+    localStorage.setItem(STORAGE_KEY_MASCOT, "true");
     showMain();
 
     if (mascot) mascot.style.display = "flex";
@@ -83,10 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   shuffleBtn?.addEventListener("click", () => {
     const nameEls = getNameNodes();
-    const buttonRow = nameContainer.querySelector("div");
-    if (nameEls.length > 0) {
+    if (nameEls.length > 1) {
+      const last = nameEls[nameEls.length - 1];
       const first = nameEls[0];
-      nameContainer.insertBefore(first, buttonRow);
+      nameContainer.insertBefore(last, first);
       saveCurrentOrder();
     }
   });
