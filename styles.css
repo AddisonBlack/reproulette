@@ -99,6 +99,7 @@ body {
 }
 
 .corner-image {
+  display: none;
   position: fixed;
   bottom: 0px;
   right: -20px;

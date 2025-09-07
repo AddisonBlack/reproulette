@@ -57,3 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+document.querySelector(".start-btn").addEventListener("click", showMascot);
+
+function showMascot() {
+  document.querySelector(".corner-image").style.display = "flex";
+}
