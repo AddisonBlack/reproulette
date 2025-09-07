@@ -52,6 +52,32 @@ document.addEventListener("DOMContentLoaded", () => {
     return arr;
   }
 
+  function flipAnimate(elements, mutate) {
+    const nodes = Array.from(elements);
+    const firstRects = new Map(nodes.map(n => [n, n.getBoundingClientRect()]));
+
+    mutate();
+
+    nodes.forEach(n => {
+      const last = n.getBoundingClientRect();
+      const first = firstRects.get(n);
+      const dx = first.left - last.left;
+      const dy = first.top - last.top;
+      if (dx || dy) {
+        n.style.transition = 'none';
+        n.style.transform = `translate(${dx}px, ${dy}px)`;
+        n.style.opacity = '0.9';
+        n.getBoundingClientRect(); // force reflow
+        requestAnimationFrame(() => {
+          n.style.transition = 'transform 300ms ease, opacity 300ms ease';
+          n.style.transform = '';
+          n.style.opacity = '';
+        });
+      }
+    });
+  }
+
+
   const savedOrder = localStorage.getItem(STORAGE_KEY_ORDER);
   if (savedOrder) {
     try {
@@ -75,15 +101,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   startBtn?.addEventListener("click", () => {
-    const nameEls = getNameNodes();
     const buttonRow = nameContainer.querySelector("div");
-    const shuffled = shuffleNodes(nameEls);
-    shuffled.forEach(el => nameContainer.insertBefore(el, buttonRow));
+    const nameEls = getNameNodes();
+    flipAnimate(nameEls, () => {
+      const shuffled = shuffleNodes(nameEls);
+      shuffled.forEach(el => nameContainer.insertBefore(el, buttonRow));
+    });
     saveCurrentOrder();
     localStorage.setItem(STORAGE_KEY_DAY, todayKey);
     localStorage.setItem(STORAGE_KEY_MASCOT, "true");
     showMain();
-
     if (mascot) mascot.style.display = "flex";
   });
 
@@ -92,7 +119,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (nameEls.length > 1) {
       const last = nameEls[nameEls.length - 1];
       const first = nameEls[0];
-      nameContainer.insertBefore(last, first);
+      flipAnimate(nameEls, () => {
+        nameContainer.insertBefore(last, first);
+      });
       saveCurrentOrder();
     }
   });

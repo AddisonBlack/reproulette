@@ -47,6 +47,8 @@ body {
 
 .name {
   font-size: 24px;
+  transition: transform 300ms ease, opacity 300ms ease;
+  will-change: transform;
 }
 
 .shuffle {
@@ -96,6 +98,15 @@ body {
       0 0 0 60px rgba(255, 255, 255, 0.1), 
       0 0 0 80px rgba(255, 255, 255, 0);
   }
+}
+
+@keyframes bump {
+  from { transform: translateY(8px); opacity: .6; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+.name.bump {
+  animation: bump 220ms ease;
 }
 
 .corner-image {
